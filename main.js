@@ -37,7 +37,7 @@ function make2DArray(cols, rows) {
   }
   for(let k = 0; k < columns; k++){
     for (let j = 0; j < rows; j++){
-      arr[k][j] = {}
+      arr[k][j] = {};
     }
   }
   return arr;
@@ -50,19 +50,20 @@ function mousePressed(){
 }
 
 function mouseWheel(event){
-  if(event.delta == 150){
+  if(event.delta > 0){
     if(speed > 1){
-      speed --
+      speed --;
       change = true;
       alpha = 255;
-      console.log("Slower: " + speed)
+      console.log("Slower: " + speed);
     }
   } else {
+    console.log(event.delta);
     if(speed < 30){
-      speed ++
+      speed ++;
       change = true;
       alpha = 255;
-      console.log("Faster: " + speed)
+      console.log("Faster: " + speed);
     }
   }
 }
@@ -93,7 +94,6 @@ function draw() {
       fill(alpha);
       text('FPS: ' + speed, 10, 30);
       alpha -= 0.1;
-      console.log(alpha)
     } else {
       change = false;
     }
