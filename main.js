@@ -4,13 +4,22 @@ let next;
 let columns;
 let rows;
 let resolution = 10;
-let speed = 20;
+let speed = 10;
+
 let change = false;
 let alpha = 255;
-let trails = true;
-let alone = false;
 let msg = "Test: "
 
+let trails = true;
+let alone = true;
+let maxStage = 5;
+
+let count = 0;
+let timer = 400;
+
+let red = 255;
+let green = 0;
+let blue = 0;
 
 function setup() {
   // put setup code here
@@ -19,6 +28,7 @@ function setup() {
   // console.log(windowHeight - (windowHeight % resolution))
   let adjustedWidth = windowWidth - 5;
   let adjustedHeight = windowHeight - 5;
+  updateColourWheel();
   createCanvas(adjustedWidth, adjustedHeight);
   columns = (adjustedWidth - (adjustedWidth % resolution)) / resolution;
   rows = (adjustedHeight - (adjustedHeight % resolution)) / resolution;
@@ -27,7 +37,7 @@ function setup() {
     for (let j = 0; j < rows; j++){
       grid[i][j] = {
         "value" : floor(random(2)),
-        "colour" : 0
+        "stage" : 0
       }
     }
   }
@@ -70,7 +80,7 @@ function mousePressed(){
   let x1 = floor(mouseX / resolution);
   let y1 = floor(mouseY / resolution);
   grid[x1][y1].value = 1;
-  grid[x1][y1].colour = 6;
+  grid[x1][y1].stage = maxStage;
 }
 
 function mouseWheel(event){
@@ -100,16 +110,21 @@ function draw() {
       let y = j * resolution;
 
       if(grid[i][j].value == 1){
-        grid[i][j].colour = 6;
+        grid[i][j].stage = maxStage;
       } else {
         if(!trails){
-            grid[i][j].colour = 0;
+            grid[i][j].stage = 0;
         }
       }
-      colourCell = getColour(grid[i][j].colour);
+      count ++
+      if(count > timer){
+        updateColourWheel();
+        count = 0;
+      }
+      colourCell = getColour(grid[i][j].stage);
 
-      if(grid[i][j].colour > 0){
-        grid[i][j].colour --;
+      if(grid[i][j].stage > 0){
+        grid[i][j].stage --;
       }
 
       fill(colourCell);
@@ -138,20 +153,20 @@ function draw() {
       // Reproduction
       if(state == 0 && neighbours.total == 3){
         next[i][j].value = 1;
-        next[i][j].colour = 6;
+        next[i][j].stage = maxStage;
       // Death
       } else if(state == 1 && (neighbours.total < 2 || neighbours.total > 3)) {
       // No cell dies alone
         if(neighbours.total == 0 && !alone){
           next[i][j].value = 1;
-          next[i][j].colour = 6;
+          next[i][j].stage = maxStage;
         } else {
           next[i][j].value = 0;
-          next[i][j].colour = 5;
+          next[i][j].stage = maxStage - 1;
         }
       } else {
         next[i][j].value = grid[i][j].value;
-        next[i][j].colour = grid[i][j].colour;
+        next[i][j].stage = grid[i][j].stage;
       }
     }
   }
@@ -174,78 +189,12 @@ function countNeighbours(grid, x, y){
 }
 
 
-function getColour(value, ){
+function getColour(stage){
   let colour;
-    switch(value){
-      case 0:
-        colour = color(10);
-      break;
-      case 1:
-        colour = color(0, 43, 0);
-      break;
-      case 2:
-        colour = color(0, 80, 0);
-      break;
-      case 3:
-        colour = color(0, 115, 0);
-      break;
-      case 4:
-        colour = color(0, 130, 0);
-      break;
-      case 5:
-        colour = color(0, 150, 0);
-      break;
-      case 6:
-        colour = color(50, 200, 50);
-      break;
-    }
-    // switch(value){
-    //   case 0:
-    //     colour = color(10);
-    //   break;
-    //   case 1:
-    //     colour = color(43, 0, 0);
-    //   break;
-    //   case 2:
-    //     colour = color(80, 0, 0);
-    //   break;
-    //   case 3:
-    //     colour = color(115, 0, 0);
-    //   break;
-    //   case 4:
-    //     colour = color(130, 0, 0);
-    //   break;
-    //   case 5:
-    //     colour = color(150, 0, 0);
-    //   break;
-    //   case 6:
-    //     colour = color(220, 10, 10);
-    //   break;
-    // }
-    // switch(value){
-    //   case 0:
-    //     colour = color(10);
-    //   break;
-    //   case 1:
-    //     colour = color(43);
-    //   break;
-    //   case 2:
-    //     colour = color(80);
-    //   break;
-    //   case 3:
-    //     colour = color(115);
-    //   break;
-    //   case 4:
-    //     colour = color(130);
-    //   break;
-    //   case 5:
-    //     colour = color(150);
-    //   break;
-    //   case 6:
-    //     colour = color(240);
-    //   break;
-    // }
-  return colour;
+  let newRed = (red / maxStage) * stage;
+  let newGreen = (green / maxStage) * stage;
+  let newBlue = (blue / maxStage) *  stage;
+  return colour = color(newRed, newGreen, newBlue);
 }
 
 
@@ -253,4 +202,25 @@ function changeMessage(string){
   change = true;
   alpha = 255;
   msg = string;
+}
+
+function updateColourWheel(){
+  if(red == 255 && green < 255 && blue == 0){
+    green += 1;
+  }
+  if(red > 0 && green == 255 && blue == 0){
+    red -= 1;
+  }
+  if(green == 255 && blue < 255 && red == 0){
+    blue += 1;
+  }
+  if(green > 0 && blue == 255 && red == 0){
+    green -= 1;
+  }
+  if(blue == 255 && red < 255 && green == 0){
+    red += 1;
+  }
+  if(blue > 0 && red == 255 && green == 0){
+    blue -= 1;
+  }
 }
