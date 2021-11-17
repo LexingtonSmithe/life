@@ -4,7 +4,9 @@ let next;
 let columns;
 let rows;
 let resolution = 10;
-const speed = 30;
+let speed = 20;
+let change = false;
+let alpha = 255;
 
 
 function setup() {
@@ -47,6 +49,23 @@ function mousePressed(){
   grid[x1][y1].colour = 6;
 }
 
+function mouseWheel(event){
+  if(event.delta == 150){
+    if(speed > 1){
+      speed --
+      change = true;
+      alpha = 255;
+      console.log("Slower: " + speed)
+    }
+  } else {
+    if(speed < 30){
+      speed ++
+      change = true;
+      alpha = 255;
+      console.log("Faster: " + speed)
+    }
+  }
+}
 
 function draw() {
   let colourBackground = color(10, 10, 10);
@@ -68,6 +87,15 @@ function draw() {
       fill(colourCell);
       stroke(0); // grid lines
       rect(x,y,resolution,resolution);
+    }
+    if(change == true && alpha > 20){
+      textSize(28);
+      fill(alpha);
+      text('FPS: ' + speed, 10, 30);
+      alpha -= 0.1;
+      console.log(alpha)
+    } else {
+      change = false;
     }
   }
 
