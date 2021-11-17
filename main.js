@@ -7,6 +7,9 @@ let resolution = 10;
 let speed = 20;
 let change = false;
 let alpha = 255;
+let trails = true;
+let alone = false;
+let msg = "Test: "
 
 
 function setup() {
@@ -42,6 +45,27 @@ function make2DArray(cols, rows) {
   }
   return arr;
 }
+
+function keyTyped() {
+  if (key === 't') {
+    if(trails == false){
+      trails = true;
+    } else {
+      trails = false;
+    }
+    changeMessage("Trails: " + trails);
+  }
+  if (key === 'l') {
+    if(alone == false){
+      alone = true;
+      change = true;
+    } else {
+      alone = false;
+    }
+    changeMessage("Die alone: " + alone);
+  }
+}
+
 function mousePressed(){
   let x1 = floor(mouseX / resolution);
   let y1 = floor(mouseY / resolution);
@@ -53,19 +77,14 @@ function mouseWheel(event){
   if(event.delta > 0){
     if(speed > 1){
       speed --;
-      change = true;
-      alpha = 255;
-      console.log("Slower: " + speed);
     }
   } else {
     console.log(event.delta);
     if(speed < 30){
       speed ++;
-      change = true;
-      alpha = 255;
-      console.log("Faster: " + speed);
     }
   }
+  changeMessage("FPS: " + speed)
 }
 
 function draw() {
@@ -76,15 +95,23 @@ function draw() {
   frameRate(speed);
   for(let i = 0; i < columns; i++){
     for (let j = 0; j < rows; j++){
+
       let x = i * resolution;
       let y = j * resolution;
+
       if(grid[i][j].value == 1){
         grid[i][j].colour = 6;
+      } else {
+        if(!trails){
+            grid[i][j].colour = 0;
+        }
       }
       colourCell = getColour(grid[i][j].colour);
+
       if(grid[i][j].colour > 0){
         grid[i][j].colour --;
       }
+
       fill(colourCell);
       stroke(0); // grid lines
       rect(x,y,resolution,resolution);
@@ -92,10 +119,11 @@ function draw() {
     if(change == true && alpha > 20){
       textSize(28);
       fill(alpha);
-      text('FPS: ' + speed, 10, 30);
+      text(msg, 10, 30);
       alpha -= 0.1;
     } else {
       change = false;
+      alpha = 255;
     }
   }
 
@@ -111,8 +139,10 @@ function draw() {
       if(state == 0 && neighbours.total == 3){
         next[i][j].value = 1;
         next[i][j].colour = 6;
+      // Death
       } else if(state == 1 && (neighbours.total < 2 || neighbours.total > 3)) {
-        if(neighbours.total == 0){
+      // No cell dies alone
+        if(neighbours.total == 0 && !alone){
           next[i][j].value = 1;
           next[i][j].colour = 6;
         } else {
@@ -216,4 +246,11 @@ function getColour(value, ){
     //   break;
     // }
   return colour;
+}
+
+
+function changeMessage(string){
+  change = true;
+  alpha = 255;
+  msg = string;
 }
