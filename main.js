@@ -3,7 +3,7 @@ let grid;
 let next;
 let columns;
 let rows;
-let resolution = 10;
+let resolution = 20;
 let speed = 10;
 
 let change = false;
@@ -12,10 +12,10 @@ let msg = "Test: "
 
 let trails = true;
 let alone = true;
-let maxStage = 5;
+let maxStage = 4;
 
 let count = 0;
-let timer = 400;
+let timer = 600;
 
 let red = 255;
 let green = 0;
@@ -128,8 +128,8 @@ function draw() {
       }
 
       fill(colourCell);
-      stroke(0); // grid lines
-      rect(x,y,resolution,resolution);
+      stroke(20); // grid lines
+      circle(x,y,resolution);
     }
     if(change == true && alpha > 20){
       textSize(28);
